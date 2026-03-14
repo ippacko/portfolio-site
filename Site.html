@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vicente Lagarrigue | Developer Portfolio</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --accent: #555555;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 40px 0;
+        }
+
+        header {
+            border-bottom: 2px solid var(--text);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; }
+        .subtitle { color: var(--accent); font-weight: bold; }
+
+        .terminal {
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            min-height: 50px;
+        }
+
+        section { margin-bottom: 40px; }
+        h2 { border-left: 5px solid var(--text); padding-left: 15px; text-transform: uppercase; font-size: 1.2rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .card:hover { border-color: var(--text); }
+
+        .tag {
+            display: inline-block;
+            background: var(--text);
+            color: var(--bg);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            margin: 5px 2px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 40px;
+        }
+
+        a { color: var(--text); text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Vicente Lagarrigue</h1>
+        <div class="subtitle">Software Developer & Cryptographer</div>
+        <p>Aspen, CO | <a href="mailto:vicentelagarrigue7@gmail.com">Email</a></p>
+    </header>
+
+    <div class="terminal">
+        <span id="typewriter"></span><span id="cursor">|</span>
+    </div>
+
+    <section id="about">
+        <h2>About</h2>
+        <p>Focused on clean code and reliable app support[cite: 3]. Specialized in back-end architecture and cryptography with experience in both Agile and Waterfall environments.</p>
+    </section>
+
+    <section id="skills">
+        <h2>Technical Stack</h2>
+        <div>
+            <strong>Languages:</strong> Java, SQL, Python, JavaScript, C/C++, C#, Q# <br>
+            <strong>Frameworks/Tools:</strong> TensorFlow, Keras, PyTorch, Git, Docker, Spring Boot [cite: 5, 27]
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2>Selected Projects</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Monocular Depth Estimation</h3>
+                <p>Trained CNN models using TensorFlow for endoscopic imaging[cite: 19].</p>
+                <span class="tag">AI/ML</span> <span class="tag">Python</span>
+            </div>
+            <div class="card">
+                <h3>MERN Full-Stack App</h3>
+                <p>Developed a CRUD application with user authentication and MongoDB[cite: 23, 24].</p>
+                <span class="tag">React</span> <span class="tag">Node.js</span>
+            </div>
+            <div class="card">
+                <h3>PL/SQL Utilities</h3>
+                <p>Automated data integrity checks and reporting using Oracle PL/SQL[cite: 25, 26].</p>
+                <span class="tag">SQL</span> <span class="tag">Database Design</span>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        Built by Vicente Lagarrigue | 2026
+    </footer>
+</div>
+
+<script>
+    const phrases = [
+        "Initializing secure environment...",
+        "Skill: Java / SQL / Python / JavaScript [cite: 2]",
+        "Focus: Clean code and reliable app support [cite: 3]",
+        "Ready to build impeccable code[cite: 4]."
+    ];
+
+    let i = 0;
+    let j = 0;
+    let currentPhrase = [];
+    let isDeleting = false;
+    const speed = 60;
+
+    function loop() {
+        const typewriter = document.getElementById('typewriter');
+        
+        if (i < phrases.length) {
+            if (!isDeleting && j <= phrases[i].length) {
+                currentPhrase.push(phrases[i][j]);
+                j++;
+            }
+
+            if (isDeleting && j <= phrases[i].length) {
+                currentPhrase.pop();
+                j--;
+            }
+
+            typewriter.innerHTML = currentPhrase.join('');
+
+            if (j == phrases[i].length) {
+                isDeleting = true;
+                setTimeout(loop, 2000); // Wait at end
+            } else if (isDeleting && j == 0) {
+                currentPhrase = [];
+                isDeleting = false;
+                i++;
+                if (i == phrases.length) i = 0;
+                setTimeout(loop, 500);
+            } else {
+                setTimeout(loop, isDeleting ? 30 : speed);
+            }
+        }
+    }
+
+    // Cursor blink
+    setInterval(() => {
+        const cursor = document.getElementById('cursor');
+        cursor.style.opacity = cursor.style.opacity == 0 ? 1 : 0;
+    }, 500);
+
+    loop();
+</script>
+
+</body>
+</html>
