@@ -3,211 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vicente Lagarrigue | Developer Portfolio</title>
+    <title>Vicente Lagarrigue | Terminal Portfolio</title>
     <style>
         :root {
-            --bg: #ffffff;
-            --text: #000000;
-            --accent: #555555;
-            --border: #e0e0e0;
+            --bg-0: #0a1114;
+            --bg-1: #101a1f;
+            --bg-2: #0f2622;
+            --surface: #0d1418;
+            --surface-2: #132026;
+            --line: #223942;
+            --text: #d8ece4;
+            --muted: #87aca2;
+            --prompt: #7ff2be;
+            --accent: #7ec3ff;
+            --warning: #ffd17e;
+            --danger: #ff8a8a;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--bg);
+            font-family: "IBM Plex Mono", "Fira Code", "Source Code Pro", Menlo, Consolas, monospace;
             color: var(--text);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 90%;
-            padding: 40px 0;
-        }
-
-        header {
-            border-bottom: 2px solid var(--text);
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-        }
-
-        h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; }
-        .subtitle { color: var(--accent); font-weight: bold; }
-
-        .terminal {
-            background: #000;
-            color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            margin-bottom: 40px;
-            min-height: 50px;
-        }
-
-        section { margin-bottom: 40px; }
-        h2 { border-left: 5px solid var(--text); padding-left: 15px; text-transform: uppercase; font-size: 1.2rem; }
-
-        .grid {
+            background:
+                radial-gradient(circle at 15% 15%, rgba(126, 195, 255, 0.2), transparent 36%),
+                radial-gradient(circle at 85% 10%, rgba(127, 242, 190, 0.14), transparent 34%),
+                radial-gradient(circle at 50% 85%, rgba(255, 209, 126, 0.1), transparent 38%),
+                linear-gradient(145deg, var(--bg-0), var(--bg-1) 48%, var(--bg-2));
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            place-items: center;
+            padding: 28px;
         }
 
-        .card {
-            border: 1px solid var(--border);
-            padding: 20px;
-            transition: 0.3s;
+        .shell {
+            width: min(980px, 100%);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            box-shadow: var(--shadow);
+            animation: boot 650ms ease-out;
         }
 
-        .card:hover { border-color: var(--text); }
+        .shell-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(8, 15, 19, 0.7);
+            padding: 10px 14px;
+            backdrop-filter: blur(8px);
+        }
 
-        .tag {
+        .traffic {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
             display: inline-block;
-            background: var(--text);
-            color: var(--bg);
-            padding: 2px 8px;
-            font-size: 0.75rem;
-            margin: 5px 2px;
         }
 
-        footer {
-            text-align: center;
-            font-size: 0.8rem;
-            border-top: 1px solid var(--border);
-            padding-top: 20px;
-            margin-top: 40px;
+        .dot.red { background: #ff6d6d; }
+        .dot.yellow { background: #ffcb63; }
+        .dot.green { background: #5add98; }
+
+        .title {
+            color: var(--muted);
+            font-size: 0.86rem;
+            letter-spacing: 0.03em;
         }
 
-        a { color: var(--text); text-decoration: underline; }
+        .shell-body {
+            background: linear-gradient(180deg, rgba(8, 12, 14, 0.94), rgba(7, 11, 13, 0.98));
+            min-height: 72vh;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px;
+            scroll-behavior: smooth;
+        }
+
+        .line {
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0 0 9px;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: reveal 280ms ease forwards;
+        }
+
+        .line.system { color: var(--muted); }
+        .line.command { color: var(--prompt); }
+        .line.error { color: var(--danger); }
+        .line.warning { color: var(--warning); }
+
+        .line a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 0.14em;
+        }
+
+        .line a:hover {
+            color: #b5ddff;
+        }
+
+        .prompt-row {
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 14px 16px 16px;
+            background: linear-gradient(180deg, var(--surface), var(--surface-2));
+        }
+
+        .prompt {
+            color: var(--prompt);
+            user-select: none;
+        }
+
+        #commandInput {
+            appearance: none;
+            border: 0;
+            outline: none;
+            border-radius: 0;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-size: 1rem;
+            width: 100%;
+            caret-color: var(--prompt);
+        }
+
+        .hint {
+            border-top: 1px dashed rgba(135, 172, 162, 0.32);
+            color: var(--muted);
+            font-size: 0.81rem;
+            padding: 10px 16px;
+            background: rgba(16, 30, 33, 0.55);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.55ch;
+            height: 1.05em;
+            background: var(--prompt);
+            margin-left: 2px;
+            vertical-align: -0.15em;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        @keyframes boot {
+            from {
+                transform: translateY(18px) scale(0.987);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes blink {
+            0%,
+            50% { opacity: 1; }
+            50.01%,
+            100% { opacity: 0; }
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .shell { border-radius: 12px; }
+            .shell-body { min-height: 76vh; max-height: 86vh; }
+            .output { padding: 14px; }
+            .prompt-row { padding: 12px 14px 14px; }
+            .hint { font-size: 0.77rem; }
+        }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <header>
-        <h1>Vicente Lagarrigue</h1>
-        <div class="subtitle">Software Developer & Cryptographer</div>
-        <p>Aspen, CO | <a href="mailto:vicentelagarrigue7@gmail.com">Email</a> | <a href="https://www.linkedin.com/in/vicente-lagarrigue/">LinkedIn</a></p>
-    </header>
-
-    <div class="terminal">
-        <span id="typewriter"></span><span id="cursor">|</span>
-    </div>
-
-    <section id="about">
-        <h2>About</h2>
-        <p>Clean, reliable, scalable code. Specialized in number theory and cryptography with experience in both Agile and Waterfall environments. Neural network training for practical applications.</p>
-        <p>US-Italian dual-citizen and polyglot, focused on building community.</p>
-    </section>
-
-    <section id="skills">
-        <h2>Technical Stack</h2>
-        <div>
-            <strong>Languages:</strong> Java, SQL, Python, JavaScript, C/C++, C#, Q# <br>
-            <strong>Frameworks/Tools:</strong> TensorFlow, Keras, PyTorch, Git, Docker, Spring Boot
-        </div>
-    </section>
-
-    <section id="education">
-        <h2>Education</h2>
-        <div class="education-item" style="margin-bottom: 20px;">
-            <strong>University of Colorado Denver</strong> | May 2024 <br>
-            <em>Bachelor of Arts in Computer Science</em>
-            <ul style="margin: 5px 0; font-size: 0.9rem; list-style-type: square;">
-                <li>Coursework: Graduate-level number theory, cryptography, Agile development, and full-stack (MERN).</li>
-                <li>Focus: Relational/non-relational database design, CPU/GPU optimization, and AI/ML model training.</li>
-            </ul>
-        </div>
-        <div class="education-item">
-            <strong>Colorado State University</strong> | Incomplete May 2021 <br>
-            <em>B.S. in Biomedical and Mechanical Engineering</em>
-            <p style="margin: 5px 0; font-size: 0.9rem;">Advanced coursework in anatomy, physiology, and engineering principles. Prototyped mobility aids and improved blood sugar monitors.</p>
-        </div>
-    </section>
-    
-    <section id="projects">
-        <h2>Selected Projects</h2>
-        <div class="grid">
-            <div class="card">
-                <a href="https://github.com/ippacko/csci4800"><h3>Monocular Depth Estimation</h3></a>
-                <p>Trained CNN models using TensorFlow for endoscopic imaging.</p>
-                <span class="tag">AI/ML</span> <span class="tag">Python</span>
+    <main class="shell" role="application" aria-label="Interactive terminal portfolio">
+        <header class="shell-header">
+            <div class="traffic" aria-hidden="true">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
             </div>
-            <div class="card">
-                <a href="https://github.com/ippacko/Hand-Tracker"><h3>Hand Tracker</h3></a>
-                <p>Python-based hand-tracking computer vision system</p>
-                <span class="tag">Python</span> <span class="tag">MediaPipe</span> <span class="tag">OpenCV</span>
-            </div>
-            <div class="card">
-                <h3>PL/SQL Utilities</h3>
-                <p>Automated data integrity checks and reporting using Oracle PL/SQL.</p>
-                <span class="tag">SQL</span> <span class="tag">Database Design</span>
-            </div>
-        </div>
-    </section>
+            <div class="title">vicente-portfolio.sh</div>
+        </header>
 
-    <footer>
-        Built by Vicente Lagarrigue | 2026
-    </footer>
-</div>
+        <section class="shell-body">
+            <div class="output" id="output" aria-live="polite"></div>
 
-<script>
-    const phrases = [
-        "Initializing secure environment...",
-        "Skills: Java / SQL / Python / JavaScript",
-        "Foci: Clean code and reliable app support",
-        "Ready to build impeccable code."
-    ];
+            <label class="prompt-row" for="commandInput">
+                <span class="prompt">visitor@portfolio:~$</span>
+                <input id="commandInput" type="text" autocomplete="off" spellcheck="false" aria-label="Terminal command input">
+            </label>
 
-    let i = 0;
-    let j = 0;
-    let currentPhrase = [];
-    let isDeleting = false;
-    const speed = 60;
+            <div class="hint">Type <strong>help</strong> and press Enter to begin.</div>
+        </section>
+    </main>
 
-    function loop() {
-        const typewriter = document.getElementById('typewriter');
-        
-        if (i < phrases.length) {
-            if (!isDeleting && j <= phrases[i].length) {
-                currentPhrase.push(phrases[i][j]);
-                j++;
+    <script>
+        const output = document.getElementById("output");
+        const input = document.getElementById("commandInput");
+
+        const history = [];
+        let historyIndex = -1;
+
+        const profile = {
+            name: "Vicente Lagarrigue",
+            role: "Software Developer & Cryptographer",
+            location: "Aspen, CO",
+            bio: "I build clean, reliable systems with a focus on cryptography, applied ML, and practical engineering.",
+            stack: ["Java", "SQL", "Python", "JavaScript", "C/C++", "C#", "Q#", "TensorFlow", "PyTorch", "Docker", "Spring Boot"],
+            contact: {
+                email: "mailto:vicentelagarrigue7@gmail.com",
+                linkedin: "https://www.linkedin.com/in/vicente-lagarrigue/",
+                github: "https://github.com/ippacko"
+            },
+            projects: [
+                {
+                    name: "Monocular Depth Estimation",
+                    desc: "Trained CNN models for endoscopic imaging using TensorFlow.",
+                    link: "https://github.com/ippacko/csci4800",
+                    tags: ["AI/ML", "Python", "TensorFlow"]
+                },
+                {
+                    name: "Hand Tracker",
+                    desc: "Real-time hand-tracking vision pipeline with MediaPipe and OpenCV.",
+                    link: "https://github.com/ippacko/Hand-Tracker",
+                    tags: ["Python", "OpenCV", "MediaPipe"]
+                },
+                {
+                    name: "PL/SQL Utilities",
+                    desc: "Automated data-integrity checks and reporting workflows in Oracle.",
+                    link: "https://github.com/ippacko",
+                    tags: ["SQL", "Oracle", "Automation"]
+                }
+            ]
+        };
+
+        const aliases = {
+            ls: "help",
+            about: "info",
+            work: "projects",
+            project: "projects",
+            cls: "clear"
+        };
+
+        function parseProjectIndex(args) {
+            if (!args.length) {
+                return null;
             }
 
-            if (isDeleting && j <= phrases[i].length) {
-                currentPhrase.pop();
-                j--;
+            if (args[0] === "open" && args[1]) {
+                return Number.parseInt(args[1], 10);
             }
 
-            typewriter.innerHTML = currentPhrase.join('');
-
-            if (j == phrases[i].length) {
-                isDeleting = true;
-                setTimeout(loop, 2000); // Wait at end
-            } else if (isDeleting && j == 0) {
-                currentPhrase = [];
-                isDeleting = false;
-                i++;
-                if (i == phrases.length) i = 0;
-                setTimeout(loop, 500);
-            } else {
-                setTimeout(loop, isDeleting ? 30 : speed);
-            }
+            return Number.parseInt(args[0], 10);
         }
-    }
 
-    // Cursor blink
-    setInterval(() => {
-        const cursor = document.getElementById('cursor');
-        cursor.style.opacity = cursor.style.opacity == 0 ? 1 : 0;
-    }, 500);
+        function openProject(index) {
+            const project = profile.projects[index - 1];
 
-    loop();
-</script>
+            if (!project) {
+                print(`Project ${index} does not exist. Try 'projects' to list options.`, "error");
+                return;
+            }
 
+            print(`Opening project ${index}: ${project.name}`, "system");
+            printLink(`link: ${project.link}`, project.link);
+            window.open(project.link, "_blank", "noopener,noreferrer");
+        }
+
+        const commands = {
+            help: () => {
+                print("Available commands:");
+                print("  help      Show this command list");
+                print("  intro     Show welcome text");
+                print("  info      Basic profile information");
+                print("  skills    Technical stack");
+                print("  projects  List selected projects");
+                print("  project N Open project number N");
+                print("  projects open N Open project number N");
+                print("  contact   Links to reach me");
+                print("  resume    Quick one-line summary");
+                print("  date      Current local time");
+                print("  clear     Clear terminal output");
+                print("  aliases   ls, about, work, project, cls", "system");
+                print("  hidden    try sudo, matrix, coffee", "system");
+            },
+            intro: () => {
+                print(`Welcome to ${profile.name}'s terminal portfolio.`);
+                print("This site is intentionally command-driven.");
+                print("Start with 'info' or 'projects'.", "system");
+            },
+            info: () => {
+                print(`${profile.name}`);
+                print(`${profile.role}`);
+                print(`${profile.location}`);
+                print(profile.bio);
+            },
+            skills: () => {
+                print("Technical stack:");
+                print(profile.stack.join(" | "));
+            },
+            projects: (args = []) => {
+                const requestedIndex = parseProjectIndex(args);
+                if (Number.isInteger(requestedIndex)) {
+                    openProject(requestedIndex);
+                    return;
+                }
+
+                print("Selected projects:");
+                profile.projects.forEach((project, index) => {
+                    print(`${index + 1}. ${project.name} - ${project.desc}`);
+                    printLink(`   link: ${project.link}`, project.link);
+                    print(`   tags: ${project.tags.join(", ")}`, "system");
+                });
+            },
+            contact: () => {
+                print("Contact:");
+                printLink("  email    vicentelagarrigue7@gmail.com", profile.contact.email);
+                printLink("  linkedin vicente-lagarrigue", profile.contact.linkedin);
+                printLink("  github   ippacko", profile.contact.github);
+            },
+            resume: () => {
+                print("Developer focused on dependable software, cryptography, and practical ML delivery.");
+            },
+            date: () => {
+                print(new Date().toString());
+            },
+            clear: () => {
+                output.innerHTML = "";
+            },
+            sudo: () => {
+                print("Permission denied: nice try.", "warning");
+            },
+            matrix: () => {
+                print("Wake up, Neo...", "system");
+                print("01001000 01100101 01101100 01101100 01101111", "system");
+                print("There is no spoon.", "system");
+            },
+            coffee: () => {
+                print("Brewing a virtual espresso...", "system");
+                print("Done. Productivity +12%", "system");
+            }
+        };
+
+        function print(text, type = "") {
+            const line = document.createElement("p");
+            line.className = `line ${type}`.trim();
+            line.textContent = text;
+            output.appendChild(line);
+            scrollOutput();
+        }
+
+        function printLink(text, href) {
+            const line = document.createElement("p");
+            line.className = "line";
+            const anchor = document.createElement("a");
+            anchor.href = href;
+            anchor.target = "_blank";
+            anchor.rel = "noopener noreferrer";
+            anchor.textContent = text;
+            line.appendChild(anchor);
+            output.appendChild(line);
+            scrollOutput();
+        }
+
+        function scrollOutput() {
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function runCommand(raw) {
+            const trimmed = raw.trim();
+            print(`visitor@portfolio:~$ ${raw}`, "command");
+
+            if (!trimmed) {
+                return;
+            }
+
+            const [name, ...args] = trimmed.split(/\s+/);
+            const lowered = name.toLowerCase();
+            const command = aliases[lowered] || lowered;
+
+            if (commands[command]) {
+                commands[command](args);
+                return;
+            }
+
+            print(`Command not found: ${command}`, "error");
+            print("Type 'help' to see available commands.", "warning");
+        }
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                const raw = input.value;
+                if (raw.trim()) {
+                    history.push(raw);
+                }
+                historyIndex = history.length;
+                runCommand(raw);
+                input.value = "";
+            }
+
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                if (!history.length) {
+                    return;
+                }
+                historyIndex = Math.max(0, historyIndex - 1);
+                input.value = history[historyIndex] || "";
+            }
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                if (!history.length) {
+                    return;
+                }
+                historyIndex = Math.min(history.length, historyIndex + 1);
+                input.value = history[historyIndex] || "";
+            }
+        });
+
+        document.addEventListener("click", () => input.focus());
+
+        print("Boot sequence complete.", "system");
+        print("Type 'help' to list commands.", "system");
+        print("", "system");
+        commands.intro();
+        input.focus();
+    </script>
 </body>
 </html>
